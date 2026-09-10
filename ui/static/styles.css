@@ -13,11 +13,12 @@
   --orange-light: #fff5e5;
   --red: #c23b45;
   --red-light: #fff0f1;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "Poppins", "Segoe UI", Arial, sans-serif;
 }
 
 * {
   box-sizing: border-box;
+  font-family: inherit;
 }
 
 body {
@@ -556,7 +557,7 @@ h2 {
 
 .event-time {
   color: #85919d;
-  font-family: Consolas, monospace;
+  font-family: inherit;
   font-size: 0.73rem;
 }
 
@@ -590,7 +591,7 @@ td {
 }
 
 td:first-child {
-  font-family: Consolas, monospace;
+  font-family: inherit;
 }
 
 .reason-pill {
