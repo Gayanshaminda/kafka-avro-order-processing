@@ -1,0 +1,7 @@
+.git
+.pytest_cache
+.venv
+__pycache__
+*.pyc
+tmp
+Assignement Chapter 3.pdf
