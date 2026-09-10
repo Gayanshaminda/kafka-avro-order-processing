@@ -57,8 +57,20 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  dashboard:
+    build: .
+    environment: *app-environment
+    command: ["python", "-m", "src.dashboard"]
+    ports:
+      - "8000:8000"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
   producer:
     build: .
+    profiles: ["terminal-demo"]
     environment: *app-environment
     command: ["python", "-m", "src.producer", "--demo", "--interval", "0.5"]
     depends_on:
@@ -67,6 +79,8 @@ services:
       consumer:
         condition: service_started
       dlq-monitor:
+        condition: service_started
+      dashboard:
         condition: service_started
     restart: "no"
 

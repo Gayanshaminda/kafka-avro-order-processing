@@ -14,7 +14,7 @@ averages, retried after temporary failures, and routed to a Dead Letter Queue
 | Running average | Overall and per-product averages in `src/processing.py` |
 | Temporary-failure retry | `orders.retry`, retry count headers, exponential backoff |
 | Permanent failure handling | `orders.dlq` plus `src/dlq_consumer.py` |
-| Live demonstration | One-command deterministic demo in `compose.yaml` |
+| Live demonstration | Browser dashboard plus deterministic demo in `compose.yaml` |
 | Git submission | Repository-ready source, tests, ignore rules, and documentation |
 
 ## Architecture
@@ -35,7 +35,7 @@ local demonstration. The consumer uses manual offset commits: it commits only
 after successful aggregation or confirmed forwarding to the retry/DLQ topic.
 The forwarding producer has Kafka idempotence enabled.
 
-## Run the live demo
+## Run the browser dashboard
 
 Prerequisite: Docker Desktop must be installed and running.
 
@@ -43,13 +43,26 @@ Prerequisite: Docker Desktop must be installed and running.
 docker compose up --build
 ```
 
-The producer sends six deterministic Avro orders:
+Open [http://localhost:8000](http://localhost:8000), then click **Run live
+demo**. The dashboard shows the Kafka connection, live topic flow, counters,
+running average by product, retry activity, and Dead Letter Queue contents.
+
+For the cleanest video recording:
+
+1. Start on the empty dashboard.
+2. Explain the producer, Kafka broker, Avro message, and consumer pipeline.
+3. Click **Run live demo** and let the activity stream update.
+4. Point out two retries for order `1005` and its eventual success.
+5. Point out order `1006` entering the Dead Letter Queue.
+6. Finish on the `5` processed messages and `$30.00` running average.
+
+The button sends six deterministic Avro orders:
 
 - Orders `1001`-`1004` succeed immediately.
 - Order `1005` fails temporarily twice, enters `orders.retry`, then succeeds.
 - Order `1006` fails permanently and appears in `orders.dlq`.
 
-Watch for these log labels:
+The same behavior remains visible in the terminal through these log labels:
 
 - `PRODUCED`: producer sent an Avro order.
 - `AGGREGATED`: price was added to the live averages.
@@ -60,6 +73,12 @@ Watch for these log labels:
 After the temporary order succeeds, the expected successful prices are 10, 20,
 30, 40, and 50. Therefore, the final overall count is `5` and the final running
 average is `30.00`. The permanently failed price 60 is not aggregated.
+
+To run the original automatic terminal demonstration instead, use:
+
+```powershell
+docker compose --profile terminal-demo up --build
+```
 
 Stop and remove the demo containers with:
 
@@ -137,10 +156,10 @@ inventory service.
 ## Suggested live explanation
 
 1. Show `order.avsc` and explain the three required fields.
-2. Start the Compose demo and point out each `PRODUCED` line.
-3. Show `AGGREGATED` lines changing the running average.
-4. Point out two `RETRY` lines for order `1005`, followed by its success.
-5. Show the permanent failure for `1006` and the `DLQ_MESSAGE` line.
+2. Open the dashboard and explain the visual Kafka pipeline.
+3. Click **Run live demo** and show the counters updating.
+4. Point out two retry events for order `1005`, followed by its success.
+5. Show order `1006` in the Dead Letter Queue table.
 6. Open the tests and explain how the core behavior is verified independently.
 
 ## Git submission

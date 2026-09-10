@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Live Kafka Avro order-processing demonstration dashboard"
+    />
+    <title>Kafka Order Flow</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div>
+            <p class="eyebrow">STREAM CONTROL / ASSIGNMENT 01</p>
+            <h1>Kafka Order Flow</h1>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="connection" id="connectionStatus" role="status">
+            <span class="status-dot"></span>
+            <span>Connecting to Kafka</span>
+          </div>
+          <button class="button button-ghost" id="resetButton" type="button">Clear view</button>
+          <button class="button button-primary" id="demoButton" type="button">
+            <span class="play-icon" aria-hidden="true"></span>
+            Run live demo
+          </button>
+        </div>
+      </header>
+
+      <section class="metric-grid" aria-label="Live metrics">
+        <article class="metric-card">
+          <p>Orders received</p>
+          <strong id="ordersMetric">0</strong>
+          <span>Avro messages</span>
+        </article>
+        <article class="metric-card metric-success">
+          <p>Processed</p>
+          <strong id="processedMetric">0</strong>
+          <span>Included in average</span>
+        </article>
+        <article class="metric-card metric-retry">
+          <p>Retry events</p>
+          <strong id="retryMetric">0</strong>
+          <span>Temporary failures</span>
+        </article>
+        <article class="metric-card metric-danger">
+          <p>Dead letters</p>
+          <strong id="dlqMetric">0</strong>
+          <span>Permanent failures</span>
+        </article>
+        <article class="metric-card metric-average">
+          <p>Running average</p>
+          <strong><span class="currency">$</span><span id="averageMetric">0.00</span></strong>
+          <span id="totalMetric">$0.00 processed value</span>
+        </article>
+      </section>
+
+      <section class="pipeline-card" aria-labelledby="pipelineHeading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">LIVE TOPOLOGY</p>
+            <h2 id="pipelineHeading">Message pipeline</h2>
+          </div>
+          <div class="schema-chip"><span>AVRO</span> order.avsc</div>
+        </div>
+
+        <div class="pipeline" id="pipeline">
+          <div class="pipeline-node producer-node" data-stage="producer">
+            <div class="node-icon">P</div>
+            <div><small>SOURCE</small><strong>Producer</strong><span>Order events</span></div>
+          </div>
+          <div class="connector"><i></i><b>orders</b></div>
+          <div class="pipeline-node broker-node" data-stage="broker">
+            <div class="node-icon">K</div>
+            <div><small>BROKER</small><strong>Apache Kafka</strong><span>1 partition</span></div>
+          </div>
+          <div class="connector"><i></i><b>Avro binary</b></div>
+          <div class="pipeline-node processor-node" data-stage="processor">
+            <div class="node-icon">C</div>
+            <div><small>PROCESSOR</small><strong>Consumer</strong><span>Manual commits</span></div>
+          </div>
+          <div class="branch-stack">
+            <div class="branch branch-success"><i></i><span>Aggregated</span></div>
+            <div class="branch branch-retry"><i></i><span>orders.retry</span></div>
+            <div class="branch branch-danger"><i></i><span>orders.dlq</span></div>
+          </div>
+          <div class="destination-stack">
+            <div class="destination success-destination"><span class="destination-dot"></span><b>Running average</b></div>
+            <div class="destination retry-destination"><span class="destination-dot"></span><b>Retry queue</b></div>
+            <div class="destination danger-destination"><span class="destination-dot"></span><b>Dead Letter Queue</b></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel averages-panel">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">REAL-TIME AGGREGATION</p>
+              <h2>Average price by product</h2>
+            </div>
+            <span class="live-chip"><i></i> LIVE</span>
+          </div>
+          <div class="chart" id="productChart">
+            <div class="empty-state">Run the demo to populate price averages.</div>
+          </div>
+        </article>
+
+        <article class="panel activity-panel">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">EVENT STREAM</p>
+              <h2>Processing activity</h2>
+            </div>
+            <span class="event-count" id="eventCount">0 events</span>
+          </div>
+          <div class="event-stream" id="eventStream" aria-live="polite"></div>
+        </article>
+      </section>
+
+      <section class="panel dlq-panel">
+        <div class="section-heading compact">
+          <div>
+            <p class="eyebrow">FAILURE INSPECTION</p>
+            <h2>Dead Letter Queue</h2>
+          </div>
+          <span class="topic-label">TOPIC · orders.dlq</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Order ID</th><th>Product</th><th>Price</th><th>Reason</th><th>Attempts</th><th>Time</th></tr>
+            </thead>
+            <tbody id="dlqTable">
+              <tr class="empty-row"><td colspan="6">No permanently failed messages.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer>
+        <span>Kafka 4.3.1</span><i></i><span>Avro binary serialization</span><i></i><span>At-least-once delivery</span>
+      </footer>
+    </main>
+
+    <div class="toast" id="toast" role="status"></div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
