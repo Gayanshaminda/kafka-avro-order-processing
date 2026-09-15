@@ -1,9 +1,24 @@
-# Kafka Order Processing Assignment
+# Kafka Avro Order Processing Pipeline
 
-This project implements the complete Chapter 3 assignment: Avro-encoded order
-messages are produced to Kafka, consumed in real time, included in running price
-averages, retried after temporary failures, and routed to a Dead Letter Queue
-(DLQ) after permanent failure or exhausted retries.
+An event-driven order-processing system that publishes Avro-encoded messages to
+Apache Kafka, processes them in real time, maintains live price aggregates, and
+handles failures through retry and Dead Letter Queue (DLQ) workflows.
+
+## Highlights
+
+- Avro schema validation and binary message serialization
+- Kafka producer, consumer, retry consumer, and DLQ monitor
+- Manual offset commits for reliable at-least-once processing
+- Exponential-backoff retries with attempt metadata in Kafka headers
+- Idempotent forwarding and in-process duplicate suppression
+- Live browser dashboard with deterministic success and failure scenarios
+- Docker Compose environment for a reproducible demonstration
+- Pytest coverage for serialization, aggregation, validation, and retry logic
+
+## Technology stack
+
+Python, Apache Kafka, Apache Avro, FastAPI, Docker Compose, JavaScript, and
+Pytest.
 
 ## Requirement coverage
 
@@ -153,27 +168,6 @@ inventory service.
 - This local broker uses plaintext networking and one replica for demonstration,
   not production deployment.
 
-## Suggested live explanation
+## Author
 
-1. Show `order.avsc` and explain the three required fields.
-2. Open the dashboard and explain the visual Kafka pipeline.
-3. Click **Run live demo** and show the counters updating.
-4. Point out two retry events for order `1005`, followed by its success.
-5. Show order `1006` in the Dead Letter Queue table.
-6. Open the tests and explain how the core behavior is verified independently.
-
-## Git submission
-
-Make meaningful commits and push the repository URL requested by the lecturer:
-
-```powershell
-git init
-git add .
-git commit -m "Implement Kafka Avro order processing assignment"
-git branch -M main
-git remote add origin YOUR_REPOSITORY_URL
-git push -u origin main
-```
-
-Do not commit generated virtual environments, logs, or Kafka data; `.gitignore`
-already excludes them.
+Developed by [Gayan Shaminda](https://github.com/Gayanshaminda).
